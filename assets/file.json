@@ -1,0 +1,98 @@
+{
+	"questions": {
+		"1": {
+			"title": "Arrange these in the correct order for an AUI setup.",
+			"type": "rearrangeList",
+			"key": "4,1,3,2,8,7,6,5",
+			"aceit": "alloy-ui-exercises/01-basics/01-setup.html",
+			"data": [
+				"YUI().use(",
+				"function(Y) {",
+				"'node',",
+				"&lt; script &gt;",
+				"&lt; /script &gt;",
+				");",
+				"}",
+				"*area for code*"
+			]
+		},
+		"2": {
+			"title": "The difference between Y.one() and Y.all() is..",
+			"type": "pickOne",
+			"key": "5",
+			"aceit": "",
+			"data": [
+				"Y.one() grabs the closest matching element. Y.all() grabs all matching elements.",
+				"Y.one() can only grab id's and Y.all() only grabs classes.",
+				"Y.one() cannot take multiple entries such as 'div > h3' whereas Y.all() can.",
+				"Y.all() cannot be used to make changes because it yeilds a list of nodes vs Y.one()",
+				"Y.one() captures a single node, whereas Y.all() generates a node list of matching elements."
+			]
+		},
+		"3": {
+			"title": "Which one of these statements is true?",
+			"situation": "",
+			"type": "pickOne",
+			"key": "2",
+			"aceit": "alloy-ui-exercises/01-basics/03-dom-manipulation.html",
+			"data": [
+				"The foo.setStyle() and foo.setHTML() could be combined in the example using foo.set().",
+				"foo.setAttrs() is a suitable way to assign attributes.",
+				"Either backgroundColor or background-color could have been used in the example.",
+				"Each change made within 'node' makes it 're-grab' the element."
+			]
+		},
+		"4": {
+			"title": "Capturing vs Bubbling, what happens when? W3C's say on it.",
+			"type": "rearrangeList",
+			"key": "3,1,4,2,5,6",
+			"aceit": "alloy-ui-exercises/01-basics/04-events.html",
+			"data": [
+				"event handled by target itself.",
+				"Outermost ancestors checked for capture such as 'onclick', continuing inward to target.",
+				"'event', in this case let's say 'click'",
+				"Capture phase started.",
+				"Bubbling phase started.",
+				"Ancestors checked for capture, starting from target's parent."
+			]
+		},
+		"5": {
+			"title": "Which one of these statements is true?",
+			"situation": "",
+			"type": "pickOne",
+			"key": "1",
+			"aceit": "alloy-ui-exercises/01-basics/05-effects.html",
+			"data": [
+				"The #foo in the example is setting the node for the effect.",
+				"The #foo in the example is activating the effect for it's container.",
+				"The #foo in the example moves the DOM pointer to the div for a declaration that happens on 'click'."
+			]
+		},
+		"6": {
+			"title": "Does the sample code work from a local file?",
+			"type": "pickOne",
+			"key": "1",
+			"aceit": "alloy-ui-exercises/01-basics/06-ajax.html",
+			"data": [
+				"No, it fails because ajax won't allow information from different home url's.",
+				"Yes, it works fine, the url sends the function 'searching' back a directory and then up to the file.",
+				"No, the url isn't complete the way it is written and will fail as a result.",
+				"Yes, it pulls the information from a server even though the html file is local.",
+				"No, it fails because ajax is a strictly server/client process."
+			]
+		},
+		"7": {
+			"title": "Which one of these statements is true?",
+			"situation": "",
+			"type": "pickOne",
+			"key": "1",
+			"aceit": "alloy-ui-exercises/01-basics/07-node.html",
+			"data": [
+				"When you create a new node it will automatically be placed after the <body> tag unless told otherwise.",
+				"In order for a newly created node to have an effect, some HTML must be assigned to it.",
+				"A created node is in DOM limbo until assigned to another DOM point (via node)."
+			]
+		}
+	}
+}
+

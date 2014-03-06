@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>AlloyUI - Test</title>
+
+	<!--
+	1 - Copy and paste
+	First load the seed and CSS files.
+	-->
+	<script src="http://cdn.alloyui.com/2.0.0pr7/aui/aui-min.js"></script>
+	<link href="http://cdn.alloyui.com/2.0.0pr7/aui-css/css/bootstrap.min.css" rel="stylesheet"></link>
+	<style>
+	body {
+		margin: 0 25%;
+		width 960px;
+	}
+
+	.order-correct {
+		background-color: lightBlue;
+		color: green;
+	}
+
+	.order-incorrect {
+		background-color: lightYellow;
+		color: red;
+	}
+	</style>
+
+</head>
+<body class="yui3-skin-sam">
+
+	<h1>AlloyUI - Test</h1>
+
+	<div>
+		<div id="pagination" class="pagination pagination-centered">
+			<ul class="pagination-content">
+				<li><a href="#">Prev</a></li>
+				<li><a href="#">Next</a></li>
+			</ul>
+		</div>
+
+		<div id="todos" class="content"></div>
+	</div>
+
+	<!--
+	2 - Start using AlloyUI
+	Then initialize AlloyUI and load a module, e.g., node.
+	-->
+	<script>
+	YUI().use(
+		'aui-ace-editor',
+		'aui-button',
+		'aui-io-request',
+		'aui-node',
+		'aui-pagination',
+		'aui-sortable-layout',
+		'aui-sortable-list',
+		function(Y) {
+
+			// Read in JSON file
+
+			Y.io.request(
+				'assets/file.json',
+				{
+					dataType: 'json',
+					on: {
+						success: function() {
+							var response = this;
+							var responseData = response.get('responseData');
+							populateContentFromJSON(responseData);
+							createPagination();
+							initExercises();
+						}
+					}
+				}
+			);
+
+			// Populate content from file.json
+
+			function populateContentFromJSON(obj) {
+				for (var i = 1; obj.questions[i]; i++) {
+					var startdiv = Y.one('#todos');
+					var addDiv = Y.Node.create('<div />');
+					var addH3 = Y.Node.create('<h3 />');
+
+					addH3.setHTML(obj.questions[i].title);
+					addDiv.setAttribute('id', 'page' + i);
+					addDiv.setStyle('display', 'none');
+					addDiv.appendChild(addH3);
+					startdiv.appendChild(addDiv);
+
+					if (obj.questions[i].type === 'rearrangeList') {
+						createAceEditor(obj.questions[i], i);
+
+						var startul = Y.Node.create('<ul />');
+						for (var j = 0; obj.questions[i].data[j]; j++) {
+							var addli = Y.Node.create('<li />');
+							addli.setAttribute('name', j + 1);
+							addli.setHTML(obj.questions[i].data[j]);
+							startul.appendChild(addli);
+						}
+						addDiv.appendChild(startul);
+
+						var btn = Y.Node.create('<input />');
+						btn.addClass('btn');
+						btn.setAttrs(
+							{
+								'name': obj.questions[i].key,
+								'type': 'submit',
+								'value': 'Check!'
+							}
+						);
+						addDiv.appendChild(btn);
+						addDiv.setAttribute('class', 'dnd');
+
+					}
+					else if (obj.questions[i].type === 'pickOne') {
+						createAceEditor(obj.questions[i], i);
+
+						var startol = Y.Node.create('<ol />');
+						for (var j = 0; obj.questions[i].data[j]; j++) {
+							var addli = Y.Node.create('<li />');
+							var btn = Y.Node.create('<input />');
+							addli.setHTML(obj.questions[i].data[j]);
+							btn.addClass('btn mini-btn');
+							btn.setAttrs(
+								{
+									'name': j + 1,
+									'type': 'button',
+									'value': 'Select'
+								}
+							);
+							startol.appendChild(addli);
+							startol.appendChild(btn);
+						}
+						addDiv.appendChild(startol);
+						addDiv.setAttribute('class','pickone');
+
+						var btn = Y.Node.create('<input />');
+						btn.setAttrs(
+							{
+								'class': 'btn',
+								'name': obj.questions[i].key,
+								'type': 'submit',
+								'value': 'Check!'
+							}
+						);
+						addDiv.appendChild(btn);
+					}
+				}
+
+				//Create an Ace Editor instance
+
+				function createAceEditor(obj, index) {
+					if (obj.aceit) {
+						var acediv = Y.Node.create('<div />');
+						acediv.setAttribute('id', "acediv" + index);
+						var h3find = addDiv;
+						h3find.all('h3');
+						acediv.appendTo(h3find);
+
+						obj.aceEditor = new Y.AceEditor(
+							{
+								boundingBox: acediv,
+								height: '350',
+								readOnly: 'true',
+								width: '100%'
+							}
+						).render();
+
+						var readTextFile = function(aceEditor, file) {
+							var rawFile = new XMLHttpRequest();
+							rawFile.open("GET", file, true);
+							rawFile.onreadystatechange = function ()
+							{
+								if(rawFile.status === 200 || rawFile.status === 0)
+									{
+										var allText = rawFile.responseText;
+										aceEditor.set('value', allText);
+									}
+							}
+							rawFile.send(null);
+						}
+
+						readTextFile(obj.aceEditor, obj.aceit);
+					}
+				}
+			}
+
+			//Pagination
+
+			function createPagination() {
+				var pages = Y.all('.content > div');
+				var contentcount = pages.getDOMNodes().length;;
+				var startgen = Y.one('.pagination-content li');
+
+				for (var i = contentcount; i > 0; i--) {
+					var p = Y.Node.create('<li />');
+					var q = Y.Node.create('<a />');
+					q.setAttribute('href', '#');
+					q.setHTML(Number(i));
+					p.setHTML(q);
+					startgen.placeAfter(p);
+				}
+
+				new Y.Pagination(
+					{
+						boundingBox: '#pagination',
+						circular: false,
+						contentBox: '#pagination .pagination-content',
+						on: {
+							changeRequest: function(event) {
+								var state = event.state;
+								var lastState = event.lastState;
+
+								if (lastState) {
+									pages.item(lastState.page - 1).setStyle('display', 'none');
+								}
+								pages.item(state.page - 1).setStyle('display', 'block');
+							}
+						},
+						page: 1
+					}
+				).render();
+			}
+
+			function initExercises() {
+
+				//Sortable Layout
+
+				var proxyNode = Y.Node.create('<div class="sortable-layout-proxy"></div>');
+
+				new Y.SortableLayout(
+					{
+						dragNodes: '.blocklet',
+						dropContainer: '.columnsections',
+						proxyNode: proxyNode
+					}
+				);
+
+				//T/F Section
+
+				var radiotf = Y.all('.pickone ol input');
+				radiotf.on(
+					'click',
+					function(e) {
+						var clicked = e.currentTarget;
+						clicked.radioClass('active');
+					}
+				);
+
+				var tfcheck = Y.all('.pickone > input');
+				tfcheck.on(
+					'click',
+					function(e) {
+						var clicked = e.currentTarget;
+						var key = clicked.getAttribute('name');
+						var div = clicked.ancestor('div');
+						var anserInput = div.one('.active');
+						var answer = anserInput.getAttribute('name').toString();
+
+						if (key === answer) {
+							anserInput.setAttribute('class', 'btn btn-success disabled');
+							anserInput.setAttribute('value', 'Correct!');
+						}
+						else {
+							anserInput.setAttribute('class', 'btn btn-danger disabled');
+							anserInput.setAttribute('value', 'Wrong');
+						}
+					}
+				);
+
+				//Make lists sortable
+
+				new Y.SortableList(
+					{
+						dropCondition: function(event) {
+							return true;
+						},
+						dropOn: '.content',
+						nodes: '.content .dnd li'
+					}
+				);
+
+				//List order checking
+
+				var nodednd = Y.all('.dnd .btn');
+				nodednd.on(
+					'click',
+					function(e) {
+						var clicked = e.currentTarget;
+						var key = clicked.getAttribute('name');
+						var lis = clicked.ancestor('div');
+						lis = lis.getElementsByTagName('li');
+						var strlis = lis.getAttribute('name').toString();
+
+						if (key === strlis) {
+							lis.removeClass('order-incorrect');
+							lis.addClass('order-correct');
+						}
+						else {
+							lis.removeClass('order-correct');
+							lis.addClass('order-incorrect');
+						}
+					}
+				);
+			}
+		}
+	);
+	</script>
+
+</body>
+</html>
